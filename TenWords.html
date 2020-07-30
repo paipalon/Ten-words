@@ -1,0 +1,120 @@
+<HTML>
+<HEAD>
+	<meta charset='utf-8'>
+	<TITLE>
+		KYMMENEN SANAN KÄSITTELIJÄ
+	</TITLE>
+	<SCRIPT>
+		
+		function show_word(i)
+		//Näyttää sanan kerrallaan. Alussa poistettava kirjain on ensimmäinen.
+		{
+			var wordlist=
+			["Tampere","Kangasala","Nokia", "Ylöjärvi","Hämeenkyrö", "Ikaalinen", "Lempäälä", "Akaa", "Hämeenlinna", "Riihimäki"];
+			var word = wordlist[i];
+			var number = (Number(i+1));
+			var deletion = 0;
+			
+			document.lomake.kaupunki.value = word;
+			document.lomake.monesko.value = number;
+			document.lomake.ohjekoodi.value = deletion;
+			document.lomake.ohje.value = set_instruction(deletion);
+		}	
+		
+		function handle_input(e){
+		//Lukee kirjaimen näppäimistöltä ja lähettää poistettavaksi.
+		//Suoritetaan vain, kun sanoja on vielä jäljellä.
+			var e = event.keyCode;                
+			var s = String.fromCharCode(e);
+			if (document.lomake.ohje.value.length>0)
+				delete_letter(s);
+		}
+		
+		function set_instruction(d)
+		{
+			if (d==0)
+				return "ENSIMMÄINEN";
+			else return "VIIMEINEN";
+		}
+		
+		function change_deletion(d)
+		//Poistettavan kirjaimen sijainnin vaihto
+		{
+			if (d==0)
+				return 1;
+			else return 0;
+		}	
+		
+		function empty_fields()
+		{
+			document.lomake.kaupunki.value = "";
+			document.lomake.monesko.value = "";
+			document.lomake.ohje.value = "";
+			document.lomake.ohjekoodi.value = "";
+		}
+		
+		function delete_letter(letter)
+		{
+			var city = document.lomake.kaupunki.value;
+			var d = document.lomake.ohjekoodi.value;
+			var order = Number(document.lomake.monesko.value);
+			var correct_letter = "";
+			var last = (city.length-1);
+			
+			//Kirjain, johon syötettyä kirjainta verrataan,
+			//on vuoroin sanan ensimmäinen tai viimeinen.
+			if (d==0)
+				correct_letter = city[0];
+			else	
+				correct_letter = city[last];
+			
+			//Oikean kirjaimen poisto alkaa	
+			if ((letter == correct_letter)||
+			((letter.toLowerCase()) == correct_letter)||
+			((letter.toUpperCase()) == correct_letter))
+			{
+				city = city.replaceAll(letter,"");
+				city = city.replaceAll((letter.toLowerCase()),"");
+				city = city.replaceAll((letter.toUpperCase()),"");
+				document.lomake.kaupunki.value = city;
+				// Uusi merkkijono sanakenttään
+				
+				if (city.length<1)
+				//Kaikki sanan merkit on poistettu. Siirrytään
+				//seuraavaan tai viimeisen kohdalla lopetetaan.
+				{
+					if (order<10)
+						show_word(order);
+					else 
+						{
+							empty_fields();
+							alert("Hyvä! Pääsit loppuun!");
+						}
+							
+					}
+				else
+				//Sanassa on vielä merkkejä. 
+				//Vaihdetaan poistettavan kirjaimen sijainti.
+				{
+					d = change_deletion(d);
+					document.lomake.ohjekoodi.value = d;
+					document.lomake.ohje.value = set_instruction(d);
+				}
+			}
+			else 
+				alert("Et ehdottanut oikeaa kirjainta");
+								
+		}
+		
+	</SCRIPT>
+</HEAD>
+<BODY onload="show_word(0)" onkeypress="handle_input()">
+	<FORM name="lomake" onSubmit="return false">
+		<br><br><br><br><br>
+		Kaupunki <input readonly type="text" name="kaupunki"><br><br>
+		Järjestys <input readonly type="text" name="monesko"><br><br><br>
+		Poistettava kirjain <input readonly type="text" name="ohje"><br><br>
+		Toimintokoodi <input readonly type="text" name="ohjekoodi">
+	</FORM>
+</BODY>
+</HTML>
